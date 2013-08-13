@@ -1,5 +1,4 @@
 import Data.Char (isLower, toUpper)
-import Prelude hiding (elem)
 
 -- Ex 5.1
 maxOccurs :: Int -> Int -> (Int, Int)
@@ -45,5 +44,88 @@ isPrime n = divisors n == [1, n]
 matches :: Int -> [Int] -> [Int]
 matches n xs = [x | x <- xs, x == n]
 
-elem :: Int -> [Int] -> Bool
-elem n xs = not $ matches n xs == []
+elem' :: Int -> [Int] -> Bool
+elem' n xs = not $ matches n xs == []
+
+-- Ex 5.13
+
+type Person = String
+type Book   = String
+
+type Database = [ (Person, Book) ]
+
+exampleBase :: Database
+exampleBase = [ ("Alice", "Tintin"), ("Anna", "Little Women"),
+                ("Alice", "Asterix"), ("Rory", "Tintin") ]
+
+books :: Database -> Person -> [Book]
+books dBase findperson = [ book | (person, book) <- dBase, findperson == person ]
+
+makeLoan :: Database -> Person -> Book -> Database
+makeLoan dBase pers bk = [ (pers, bk) ] ++ dBase
+
+returnLoan :: Database => Person -> Book -> Database
+returnLoan dBase pers bk = [ pair | pair <- dBase, pair /= (pers, bk) ]
+
+borrowers :: Database -> Book -> [Person] 
+borrowers dBase bk = [ person | (person, book) <- dBase, bk == book ]
+
+borrowed :: Database -> Book -> Bool
+borrowed dBase bk = not (null (borrowers dBase bk))
+
+numBorrowed :: Database -> Person -> Int
+numBorrowed dBase pers = length $ books dBase pers
+
+-- Ex 5.16
+-- snd :: (a, b) -> b
+-- sing :: a -> [a]
+
+-- Ex 5.19
+stringToUpper :: String -> String
+stringToUpper str = [ toUpper ch | ch <- str ]
+
+-- Ex 5.20
+romanDigit :: Char -> String
+romanDigit ch = 
+  case ch of
+    '1' -> "I"
+    '2' -> "II"
+    '3' -> "III"
+    '4' -> "IV"
+    '5' -> "V"
+    '6' -> "VI"
+    '7' -> "VII"
+    '8' -> "VIII"
+    '9' -> "IX"
+
+-- Ex 5.21
+onThreeLines :: String -> String -> String -> String
+onThreeLines str1 str2 str3 = str1 ++ "\n" ++ str2 ++ "\n" ++ str3 ++ "\n"
+
+-- Ex 5.22
+onSeparateLines :: [String] -> String
+onSeparateLines xs = concat [ x ++"\n" | x <- xs ]
+
+-- Ex 5.23
+duplicate :: String -> Int -> String
+duplicate str n
+  | n <= 0 = ""
+  | n == 1 = str
+  | otherwise = str ++ duplicate str (n-1)
+
+-- Ex 5.24
+linelength :: Int
+linelength = 12
+
+pushRight :: String -> String
+pushRight str = duplicate " " (linelength - length str)  ++ str 
+
+-- Ex 5.25
+fib :: Int -> Int
+fib n
+  | n <= 1 = n
+  | otherwise = fib (n-1) + fib (n-2)
+
+fibTable :: Int -> String
+fibTable n = pushRight "n" ++ pushRight "fib n" ++ "\n" ++ onSeparateLines table
+             where table = [pushRight (show x) ++ pushRight (show (fib x)) | x <- [0..n]]
